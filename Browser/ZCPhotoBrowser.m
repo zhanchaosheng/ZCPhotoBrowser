@@ -15,8 +15,6 @@
 @interface ZCPhotoBrowser ()<UICollectionViewDataSource,UICollectionViewDelegate,
 UIViewControllerTransitioningDelegate,ZCPhotoBrowserCellDelegate>
 
-/// 当前显示的图片序号，从0开始
-@property (nonatomic, assign) NSUInteger currentIndex;
 /// 当前正在显示视图的前一个页面关联视图
 @property (nonatomic, strong) UIView *relatedView;
 /// 本VC的presentingViewController
@@ -292,6 +290,27 @@ UIViewControllerTransitioningDelegate,ZCPhotoBrowserCellDelegate>
         }
         window.windowLevel = self.originWindowLevel;
     }
+}
+
+#pragma mark - 3D Touch
+
+- (NSArray<id<UIPreviewActionItem>> *)previewActionItems {
+    
+    NSMutableArray *arrItem = [NSMutableArray array];
+    
+    UIPreviewAction *previewAction0 = [UIPreviewAction actionWithTitle:@"取消" style:UIPreviewActionStyleDestructive handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
+        
+        NSLog(@"预览菜单\"取消\"");
+    }];
+    
+    UIPreviewAction *previewAction1 = [UIPreviewAction actionWithTitle:@"相关操作" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
+        NSLog(@"预览菜单\"相关操作\"");
+        
+    }];
+    
+    [arrItem addObjectsFromArray:@[previewAction0 ,previewAction1]];
+    
+    return arrItem;
 }
 
 @end

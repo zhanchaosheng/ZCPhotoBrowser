@@ -17,6 +17,30 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    NSMutableArray *shortcutItems = [NSMutableArray arrayWithArray:[UIApplication sharedApplication].shortcutItems];
+    UIApplicationShortcutItem *item0 = [[UIApplicationShortcutItem alloc] initWithType:@"com.cmcc.cusen.openSearch"
+                                                                       localizedTitle:@"搜索"
+                                                                    localizedSubtitle:@"搜一搜"
+                                                                                 icon:[UIApplicationShortcutIcon iconWithType:UIApplicationShortcutIconTypeSearch]
+                                                                             userInfo:nil];
+    [shortcutItems addObject:item0];
+    
+    UIApplicationShortcutItem *item1 = [[UIApplicationShortcutItem alloc] initWithType:@"com.cmcc.cusen.openCapturePhoto"
+                                                                        localizedTitle:@"拍照"
+                                                                     localizedSubtitle:nil
+                                                                                  icon:[UIApplicationShortcutIcon iconWithType:UIApplicationShortcutIconTypeCapturePhoto]
+                                                                              userInfo:nil];
+    [shortcutItems addObject:item1];
+    
+    UIApplicationShortcutItem *item2 = [[UIApplicationShortcutItem alloc] initWithType:@"com.cmcc.cusen.openMessage"
+                                                                        localizedTitle:@"新消息"
+                                                                     localizedSubtitle:nil
+                                                                                  icon:[UIApplicationShortcutIcon iconWithType:UIApplicationShortcutIconTypeMessage]
+                                                                              userInfo:nil];
+    
+    [shortcutItems addObject:item2];
+    
+    [UIApplication sharedApplication].shortcutItems = shortcutItems;
     return YES;
 }
 
@@ -47,5 +71,10 @@
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
 
+- (void)application:(UIApplication *)application performActionForShortcutItem:(UIApplicationShortcutItem *)shortcutItem completionHandler:(void (^)(BOOL))completionHandler {
+    
+    //不管APP在后台还是进程被杀死，只要通过主屏快捷操作进来的，都会调用这个方法
+    NSLog(@"name:%@\ntype:%@", shortcutItem.localizedTitle, shortcutItem.type);
+}
 
 @end

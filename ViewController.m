@@ -12,8 +12,9 @@
 #import "ZCPhotoBrowserDefaultPageControlDelegate.h"
 #import "ZCPhotoBrowserNumberPageControlDelegate.h"
 #import <UIImageView+WebCache.h>
+#import "testViewController0.h"
 
-@interface ViewController ()<UICollectionViewDelegate, UICollectionViewDataSource, ZCPhotoBrowserDelegate>
+@interface ViewController ()<UICollectionViewDelegate, UICollectionViewDataSource, UIViewControllerPreviewingDelegate, ZCPhotoBrowserDelegate>
 @property (nonatomic, strong) NSArray *thumbnailImageUrls;
 @property (nonatomic, strong) NSArray *highQualityImageUrls;
 @property (nonatomic, weak) PhotoCollectionViewCell *selectedCell;
@@ -25,6 +26,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
     self.thumbnailImageUrls = @[@"http://wx1.sinaimg.cn/thumbnail/bfc243a3gy1febm7n9eorj20i60hsann.jpg",
                                @"http://wx3.sinaimg.cn/thumbnail/bfc243a3gy1febm7nzbz7j20ib0iek5j.jpg",
                                @"http://wx1.sinaimg.cn/thumbnail/bfc243a3gy1febm7orgqfj20i80ht15x.jpg",
@@ -91,6 +93,26 @@
 - (__kindof UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     PhotoCollectionViewCell *cell = (PhotoCollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:NSStringFromClass([PhotoCollectionViewCell class]) forIndexPath:indexPath];
     [cell.imageView sd_setImageWithURL:self.thumbnailImageUrls[indexPath.item]];
+    
+    //注册3D Touch
+    /**
+     从iOS9开始，我们可以通过这个类来判断运行程序对应的设备是否支持3D Touch功能。
+     
+     UIForceTouchCapabilityUnknown = 0,     //未知
+     UIForceTouchCapabilityUnavailable = 1, //不可用
+     UIForceTouchCapabilityAvailable = 2    //可用
+     */
+    if ([self respondsToSelector:@selector(traitCollection)]) {
+        
+        if ([self.traitCollection respondsToSelector:@selector(forceTouchCapability)]) {
+            
+            if (self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable) {
+                
+                [self registerForPreviewingWithDelegate:self sourceView:cell];
+            }
+        }
+    }
+    
     return cell;
 }
 
@@ -98,6 +120,7 @@
 
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    
     PhotoCollectionViewCell *cell = (PhotoCollectionViewCell *)[collectionView cellForItemAtIndexPath:indexPath];
     if (!cell) {
         return;
@@ -143,4 +166,27 @@
     NSString *url = self.highQualityImageUrls[index];
     return [NSURL URLWithString:url];
 }
+
+#pragma mark - UIViewControllerPreviewingDelegate
+
+- (nullable UIViewController *)previewingContext:(id <UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
+    NSIndexPath *indexPath = [self.collectionView indexPathForCell:(UICollectionViewCell *)previewingContext.sourceView];
+    
+    ZCPhotoBrowser *photoBrowser = [[ZCPhotoBrowser alloc] initWithPresentingViewController:self andDelegate:self];
+    self.pageControlDelegate = [[ZCPhotoBrowserNumberPageControlDelegate alloc] initWithNumberOfPages:self.thumbnailImageUrls.count];
+    photoBrowser.photoBrowserPageControlDelegate = self.pageControlDelegate;
+    photoBrowser.currentIndex = indexPath.item;
+    
+    //指定当前上下文视图Rect
+    //CGRect rect = CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, 300);
+    previewingContext.sourceRect = previewingContext.sourceView.frame;
+    
+    return photoBrowser;
+}
+
+//- (void)previewingContext:(id <UIViewControllerPreviewing>)previewingContext commitViewController:(UIViewController *)viewControllerToCommit {
+//    
+//    [self showViewController:viewControllerToCommit sender:self];
+//}
+
 @end

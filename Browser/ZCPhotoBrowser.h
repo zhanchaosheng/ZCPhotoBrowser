@@ -60,6 +60,9 @@
 @property (nonatomic, weak) id<ZCPhotoBrowserDelegate> photoBrowserDelegate;
 @property (nonatomic, weak) id<ZCPhotoBrowserPageControlDelegate> photoBrowserPageControlDelegate;
 
+/// 当前显示的图片序号，从0开始
+@property (nonatomic, assign) NSUInteger currentIndex;
+
 /// 左右两张图之间的间隙, defualt is 30
 @property (nonatomic, assign) CGFloat photoSpacing;
 
